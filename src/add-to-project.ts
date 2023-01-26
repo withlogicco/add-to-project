@@ -46,6 +46,12 @@ export async function addToProject(): Promise<void> {
       .map(l => l.trim().toLowerCase())
       .filter(l => l.length > 0) ?? []
   const labelOperator = core.getInput('label-operator').trim().toLocaleLowerCase()
+  const fields = core.getInput('fields')
+  const fieldsObject = fields ? JSON.parse(fields) : {}
+
+  for (const [key, value] of Object.entries(fieldsObject)) {
+    console.log(`${key}: ${value}`)
+ }
 
   const octokit = github.getOctokit(ghToken)
 
