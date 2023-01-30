@@ -31,6 +31,14 @@ interface ProjectAddItemResponse {
   }
 }
 
+interface ProjectUpdateItemResponse {
+  updateProjectV2ItemById: {
+    item: {
+      id: string
+    }
+  }
+}
+
 interface ProjectFieldsResponse {
   node: {
     id: string
@@ -174,6 +182,7 @@ export async function addToProject(): Promise<void> {
   const projectFields = fieldsResp.node?.fields.nodes ?? []
 
   const results = check.checkDictionaryInArray(fieldsObj, projectFields)
+  let itemId = ''
 
   // Next, use the GraphQL API to add the issue to the project.
   // If the issue has the same owner as the project, we can directly
@@ -198,6 +207,7 @@ export async function addToProject(): Promise<void> {
     )
 
     core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
+    itemId = addResp.addProjectV2ItemById.item.id
   } else {
     core.info('Creating draft issue in project')
 
@@ -219,6 +229,32 @@ export async function addToProject(): Promise<void> {
     )
 
     core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id)
+    itemId = addResp.addProjectV2DraftIssue.projectItem.id
+  }
+
+  // update the project with the custom fields
+  for (const [key, value] of Object.entries(results)) {
+    const updateResp = await octokit.graphql<ProjectUpdateItemResponse>(
+      `mutation updateProjectItem($input: UpdateProjectV2ItemInput!) {
+          updateProjectV2Item(
+            input: {
+              projectId: $projectId,
+              itemId: $itemId,
+              fieldId: $fieldId,
+              value: $value
+          )
+        }`,
+      {
+        input: {
+          projectId,
+          itemId,
+          fieldId: key,
+          value,
+        },
+      },
+    )
+
+    core.setOutput('itemId', updateResp.updateProjectV2ItemById.item.id)
   }
 }
 
