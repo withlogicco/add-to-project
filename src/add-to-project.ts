@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import * as check from './check-custom-fields'
 
 // TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
 // https://github.com/orgs|users/<ownerName>/projects/<projectNumber>
@@ -10,12 +11,14 @@ interface ProjectNodeIDResponse {
   organization?: {
     projectV2: {
       id: string
+      fields: string
     }
   }
 
   user?: {
     projectV2: {
       id: string
+      fields: string
     }
   }
 }
@@ -24,6 +27,15 @@ interface ProjectAddItemResponse {
   addProjectV2ItemById: {
     item: {
       id: string
+    }
+  }
+}
+
+interface ProjectFieldsResponse {
+  node: {
+    id: string
+    fields: {
+      nodes: []
     }
   }
 }
@@ -39,6 +51,13 @@ interface ProjectV2AddDraftIssueResponse {
 export async function addToProject(): Promise<void> {
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
+  const fields = core.getInput('fields', {required: true})
+  const fieldsObj = fields.split('\n').reduce((acc, f) => {
+    const [key, value] = f.split('=').map(s => s.trim())
+    acc[key.toLowerCase()] = value.toLowerCase()
+    return acc
+  }, {} as {[key: string]: string})
+
   const labeled =
     core
       .getInput('labeled')
@@ -112,6 +131,49 @@ export async function addToProject(): Promise<void> {
 
   core.debug(`Project node ID: ${projectId}`)
   core.debug(`Content ID: ${contentId}`)
+
+  // Next, use the GraphQL API to request the project's fields using the node ID.
+  const fieldsResp = await octokit.graphql<ProjectFieldsResponse>(
+    `query getProjectFields($projectId: ID!) {
+      node(id: $projectId) {
+        ... on ProjectV2 {
+          fields(first: 50) {
+            nodes {
+              ... on ProjectV2Field {
+                id
+                name
+              }
+              ... on ProjectV2IterationField {
+                id
+                name
+                configuration {
+                  iterations {
+                    startDate
+                    id
+                  }
+                }
+              }
+              ... on ProjectV2SingleSelectField {
+                id
+                name
+                options {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }`,
+    {
+      projectId,
+    },
+  )
+
+  const projectFields = fieldsResp.node?.fields.nodes ?? []
+
+  const results = check.checkDictionaryInArray(fieldsObj, projectFields)
 
   // Next, use the GraphQL API to add the issue to the project.
   // If the issue has the same owner as the project, we can directly

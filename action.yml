@@ -19,7 +19,6 @@ inputs:
   fields:
     required: false
     description: A json object containing custom fields like product and client
-    type: object
 runs:
   using: 'node16'
   main: 'dist/index.js'
