@@ -31,7 +31,7 @@ export async function checkDictionaryInArray(obj: {[key: string]: string}, arr: 
         if (optionFound) {
           const id = found.id
           const value = optionFound.id
-          result.push({id, value})
+          result.push({id, value: {singleSelectOptionId: value}})
         }
       }
     }

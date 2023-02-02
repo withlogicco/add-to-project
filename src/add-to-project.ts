@@ -32,8 +32,8 @@ interface ProjectAddItemResponse {
 }
 
 interface ProjectUpdateItemResponse {
-  updateProjectV2ItemById: {
-    item: {
+  updateProjectV2ItemFieldValue: {
+    projectV2Item: {
       id: string
     }
   }
@@ -154,6 +154,7 @@ export async function addToProject(): Promise<void> {
               ... on ProjectV2IterationField {
                 id
                 name
+                dataType
                 configuration {
                   iterations {
                     startDate
@@ -164,6 +165,7 @@ export async function addToProject(): Promise<void> {
               ... on ProjectV2SingleSelectField {
                 id
                 name
+                dataType
                 options {
                   id
                   name
@@ -181,7 +183,7 @@ export async function addToProject(): Promise<void> {
 
   const projectFields = fieldsResp.node?.fields.nodes ?? []
 
-  const results = check.checkDictionaryInArray(fieldsObj, projectFields)
+  const results = await check.checkDictionaryInArray(fieldsObj, projectFields)
   let itemId = ''
 
   // Next, use the GraphQL API to add the issue to the project.
@@ -233,28 +235,26 @@ export async function addToProject(): Promise<void> {
   }
 
   // update the project with the custom fields
-  for (const [key, value] of Object.entries(results)) {
+  for (const result of results) {
     const updateResp = await octokit.graphql<ProjectUpdateItemResponse>(
-      `mutation updateProjectItem($input: UpdateProjectV2ItemInput!) {
-          updateProjectV2Item(
-            input: {
-              projectId: $projectId,
-              itemId: $itemId,
-              fieldId: $fieldId,
-              value: $value
-          )
-        }`,
+      `mutation UpdateFieldValue($input: UpdateProjectV2ItemFieldValueInput!) {
+        updateProjectV2ItemFieldValue(input: $input) {
+          projectV2Item {
+            id
+          }
+        }
+      }`,
       {
         input: {
           projectId,
           itemId,
-          fieldId: key,
-          value,
+          fieldId: result.id,
+          value: result.value,
         },
       },
     )
 
-    core.setOutput('itemId', updateResp.updateProjectV2ItemById.item.id)
+    core.setOutput('itemId', updateResp.updateProjectV2ItemFieldValue.projectV2Item.id)
   }
 }
 
