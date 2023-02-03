@@ -57,10 +57,6 @@ interface ProjectV2AddDraftIssueResponse {
 }
 
 export async function addToProject(): Promise<void> {
-  process.env['INPUT_PROJECT-URL'] = 'https://github.com/orgs/withlogicco/projects/12'
-  process.env['INPUT_GITHUB-TOKEN'] = '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'
-  process.env['INPUT_FIELDS'] = 'Product=VaUlty\nClient=Arpedon'
-
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
   const fields = core.getInput('fields', {required: false})
@@ -75,11 +71,9 @@ export async function addToProject(): Promise<void> {
 
   const octokit = github.getOctokit(ghToken)
 
-  // const issue = github.context.payload.issue ?? github.context.payload.pull_request
-  const issue = check.JSON_OBJECT
+  const issue = github.context.payload.issue ?? github.context.payload.pull_request
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
-  // const issueOwnerName = github.context.payload.repository?.owner.login
-  const issueOwnerName = 'withlogicco'
+  const issueOwnerName = github.context.payload.repository?.owner.login
 
   core.debug(`Issue/PR owner: ${issueOwnerName}`)
 
