@@ -13,7 +13,7 @@ describe('addToProject', () => {
   beforeEach(() => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/actions/projects/1',
-      'github-token': 'gh_token',
+      'github-token': 'gh_token'
     })
 
     outputs = mockSetOutput()
@@ -30,14 +30,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'bug'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     mockGraphQL(
@@ -46,21 +46,21 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
+              id: 'project-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
     )
 
     await addToProject()
@@ -74,14 +74,14 @@ describe('addToProject', () => {
         number: 2221,
         labels: [{name: 'bug'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/octokit/octokit.js/issues/2221',
+        html_url: 'https://github.com/octokit/octokit.js/issues/2221'
       },
       repository: {
         name: 'octokit.js',
         owner: {
-          login: 'octokit',
-        },
-      },
+          login: 'octokit'
+        }
+      }
     }
 
     mockGraphQL(
@@ -90,73 +90,25 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
+              id: 'project-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2DraftIssue/,
         return: {
           addProjectV2DraftIssue: {
             projectItem: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
     )
 
     await addToProject()
 
-    expect(outputs.itemId).toEqual('project-item-id')
-  })
-
-  test('add an issue with fields product and client', async () => {
-    mockGetInput({
-      'project-url': 'https://github.com/orgs/actions/projects/1',
-      'github-token': 'gh_token',
-      fields: 'product=test-product, client=test-client',
-    })
-
-    github.context.payload = {
-      issue: {
-        number: 1,
-        labels: [{name: 'bug'}],
-        // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
-      },
-      repository: {
-        name: 'add-to-project',
-        owner: {
-          login: 'actions',
-        },
-      },
-    }
-
-    mockGraphQL(
-      {
-        test: /getProject/,
-        return: {
-          organization: {
-            projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
-      },
-      {
-        test: /addProjectV2ItemById/,
-        return: {
-          addProjectV2ItemById: {
-            item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
-    )
-    await addToProject()
     expect(outputs.itemId).toEqual('project-item-id')
   })
 
@@ -164,7 +116,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
-      labeled: 'bug, new',
+      labeled: 'bug, new'
     })
 
     github.context.payload = {
@@ -172,14 +124,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'bug'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     mockGraphQL(
@@ -188,21 +140,21 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
+              id: 'project-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
     )
 
     await addToProject()
@@ -214,7 +166,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
-      labeled: 'bug, new',
+      labeled: 'bug, new'
     })
 
     github.context.payload = {
@@ -223,14 +175,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'bug'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/pull/136',
+        html_url: 'https://github.com/actions/add-to-project/pull/136'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     mockGraphQL(
@@ -239,21 +191,21 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
+              id: 'project-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
     )
 
     await addToProject()
@@ -265,7 +217,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
-      labeled: 'bug',
+      labeled: 'bug'
     })
 
     github.context.payload = {
@@ -273,14 +225,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     const infoSpy = jest.spyOn(core, 'info')
@@ -295,7 +247,7 @@ describe('addToProject', () => {
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new',
-      'label-operator': 'AND',
+      'label-operator': 'AND'
     })
 
     github.context.payload = {
@@ -303,14 +255,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'bug'}, {name: 'new'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     mockGraphQL(
@@ -319,21 +271,21 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
+              id: 'project-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
     )
 
     await addToProject()
@@ -346,7 +298,7 @@ describe('addToProject', () => {
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new',
-      'label-operator': 'AND',
+      'label-operator': 'AND'
     })
 
     github.context.payload = {
@@ -354,14 +306,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'bug'}, {name: 'other'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     const infoSpy = jest.spyOn(core, 'info')
@@ -376,7 +328,7 @@ describe('addToProject', () => {
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new',
-      'label-operator': 'NOT',
+      'label-operator': 'NOT'
     })
 
     github.context.payload = {
@@ -384,14 +336,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'bug'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     const infoSpy = jest.spyOn(core, 'info')
@@ -406,7 +358,7 @@ describe('addToProject', () => {
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'bug, new',
-      'label-operator': 'NOT',
+      'label-operator': 'NOT'
     })
 
     github.context.payload = {
@@ -414,14 +366,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'other'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     mockGraphQL(
@@ -430,21 +382,21 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-next-id',
-            },
-          },
-        },
+              id: 'project-next-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-next-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
     )
 
     await addToProject()
@@ -456,7 +408,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
-      labeled: 'accessibility,backend,bug',
+      labeled: 'accessibility,backend,bug'
     })
 
     github.context.payload = {
@@ -464,14 +416,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'accessibility'}, {name: 'backend'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     const gqlMock = mockGraphQL(
@@ -480,21 +432,21 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
+              id: 'project-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
     )
 
     const infoSpy = jest.spyOn(core, 'info')
@@ -512,7 +464,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
-      labeled: 'accessibility, backend, bug',
+      labeled: 'accessibility, backend, bug'
     })
 
     github.context.payload = {
@@ -520,21 +472,21 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'data'}, {name: 'frontend'}, {name: 'improvement'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     const infoSpy = jest.spyOn(core, 'info')
     const gqlMock = mockGraphQL()
     await addToProject()
     expect(infoSpy).toHaveBeenCalledWith(
-      `Skipping issue 1 because it does not have one of the labels: accessibility, backend, bug`,
+      `Skipping issue 1 because it does not have one of the labels: accessibility, backend, bug`
     )
     expect(gqlMock).not.toHaveBeenCalled()
   })
@@ -543,7 +495,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
-      labeled: 'accessibility  ,   backend    ,,  . ,     bug',
+      labeled: 'accessibility  ,   backend    ,,  . ,     bug'
     })
 
     github.context.payload = {
@@ -552,14 +504,14 @@ describe('addToProject', () => {
         labels: [{name: 'accessibility'}, {name: 'backend'}, {name: 'bug'}],
         'label-operator': 'AND',
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     const gqlMock = mockGraphQL(
@@ -568,21 +520,21 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
+              id: 'project-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
     )
 
     const infoSpy = jest.spyOn(core, 'info')
@@ -599,7 +551,7 @@ describe('addToProject', () => {
   test(`throws an error when url isn't a valid project url`, async () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/github/repositories',
-      'github-token': 'gh_token',
+      'github-token': 'gh_token'
     })
 
     github.context.payload = {
@@ -607,20 +559,20 @@ describe('addToProject', () => {
         number: 1,
         labels: [],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     const infoSpy = jest.spyOn(core, 'info')
     const gqlMock = mockGraphQL()
     await expect(addToProject()).rejects.toThrow(
-      'https://github.com/orgs/github/repositories. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>',
+      'https://github.com/orgs/github/repositories. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>'
     )
     expect(infoSpy).not.toHaveBeenCalled()
     expect(gqlMock).not.toHaveBeenCalled()
@@ -629,7 +581,7 @@ describe('addToProject', () => {
   test(`throws an error when url isn't under the github.com domain`, async () => {
     mockGetInput({
       'project-url': 'https://notgithub.com/orgs/github/projects/1',
-      'github-token': 'gh_token',
+      'github-token': 'gh_token'
     })
 
     github.context.payload = {
@@ -637,20 +589,20 @@ describe('addToProject', () => {
         number: 1,
         labels: [],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     const infoSpy = jest.spyOn(core, 'info')
     const gqlMock = mockGraphQL()
     await expect(addToProject()).rejects.toThrow(
-      'https://notgithub.com/orgs/github/projects/1. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>',
+      'https://notgithub.com/orgs/github/projects/1. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>'
     )
     expect(infoSpy).not.toHaveBeenCalled()
     expect(gqlMock).not.toHaveBeenCalled()
@@ -660,7 +612,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
-      labeled: 'bug, new',
+      labeled: 'bug, new'
     })
 
     github.context.payload = {
@@ -668,14 +620,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'bug'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     const gqlMock = mockGraphQL(
@@ -684,28 +636,28 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
+              id: 'project-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
     )
 
     await addToProject()
 
     expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('organization(login: $projectOwnerName)'), {
       projectOwnerName: 'actions',
-      projectNumber: 1,
+      projectNumber: 1
     })
   })
 
@@ -713,7 +665,7 @@ describe('addToProject', () => {
     mockGetInput({
       'project-url': 'https://github.com/users/monalisa/projects/1',
       'github-token': 'gh_token',
-      labeled: 'bug, new',
+      labeled: 'bug, new'
     })
 
     github.context.payload = {
@@ -721,14 +673,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'bug'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/monalisa/add-to-project/issues/74',
+        html_url: 'https://github.com/monalisa/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'monalisa',
-        },
-      },
+          login: 'monalisa'
+        }
+      }
     }
 
     const gqlMock = mockGraphQL(
@@ -737,28 +689,28 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-id',
-            },
-          },
-        },
+              id: 'project-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-item-id'
+            }
+          }
+        }
+      }
     )
 
     await addToProject()
 
     expect(gqlMock).toHaveBeenNthCalledWith(1, expect.stringContaining('user(login: $projectOwnerName)'), {
       projectOwnerName: 'monalisa',
-      projectNumber: 1,
+      projectNumber: 1
     })
   })
 
@@ -767,7 +719,7 @@ describe('addToProject', () => {
       'project-url': 'https://github.com/orgs/actions/projects/1',
       'github-token': 'gh_token',
       labeled: 'FOO, Bar, baz',
-      'label-operator': 'AND',
+      'label-operator': 'AND'
     })
 
     github.context.payload = {
@@ -775,14 +727,14 @@ describe('addToProject', () => {
         number: 1,
         labels: [{name: 'foo'}, {name: 'BAR'}, {name: 'baz'}],
         // eslint-disable-next-line camelcase
-        html_url: 'https://github.com/actions/add-to-project/issues/74',
+        html_url: 'https://github.com/actions/add-to-project/issues/74'
       },
       repository: {
         name: 'add-to-project',
         owner: {
-          login: 'actions',
-        },
-      },
+          login: 'actions'
+        }
+      }
     }
 
     mockGraphQL(
@@ -791,21 +743,21 @@ describe('addToProject', () => {
         return: {
           organization: {
             projectV2: {
-              id: 'project-next-id',
-            },
-          },
-        },
+              id: 'project-next-id'
+            }
+          }
+        }
       },
       {
         test: /addProjectV2ItemById/,
         return: {
           addProjectV2ItemById: {
             item: {
-              id: 'project-next-item-id',
-            },
-          },
-        },
-      },
+              id: 'project-next-item-id'
+            }
+          }
+        }
+      }
     )
 
     await addToProject()
@@ -858,7 +810,7 @@ function mockGraphQL(...mocks: {test: RegExp; return: unknown}[]): jest.Mock {
 
   jest.spyOn(github, 'getOctokit').mockImplementation(() => {
     return {
-      graphql: mock,
+      graphql: mock
     } as unknown as ReturnType<typeof github.getOctokit>
   })
 

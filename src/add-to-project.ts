@@ -57,14 +57,13 @@ interface ProjectV2AddDraftIssueResponse {
 }
 
 export async function addToProject(): Promise<void> {
+  process.env['INPUT_PROJECT-URL'] = 'https://github.com/orgs/withlogicco/projects/12'
+  process.env['INPUT_GITHUB-TOKEN'] = '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'
+  process.env['INPUT_FIELDS'] = 'Product=VaUlty\nClient=Arpedon'
+
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
-  const fields = core.getInput('fields', {required: true})
-  const fieldsObj = fields.split('\n').reduce((acc, f) => {
-    const [key, value] = f.split('=').map(s => s.trim())
-    acc[key.toLowerCase()] = value.toLowerCase()
-    return acc
-  }, {} as {[key: string]: string})
+  const fields = core.getInput('fields', {required: false})
 
   const labeled =
     core
@@ -76,9 +75,11 @@ export async function addToProject(): Promise<void> {
 
   const octokit = github.getOctokit(ghToken)
 
-  const issue = github.context.payload.issue ?? github.context.payload.pull_request
+  // const issue = github.context.payload.issue ?? github.context.payload.pull_request
+  const issue = check.JSON_OBJECT
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
-  const issueOwnerName = github.context.payload.repository?.owner.login
+  // const issueOwnerName = github.context.payload.repository?.owner.login
+  const issueOwnerName = 'withlogicco'
 
   core.debug(`Issue/PR owner: ${issueOwnerName}`)
 
@@ -149,18 +150,8 @@ export async function addToProject(): Promise<void> {
             nodes {
               ... on ProjectV2Field {
                 id
-                name
-              }
-              ... on ProjectV2IterationField {
-                id
-                name
                 dataType
-                configuration {
-                  iterations {
-                    startDate
-                    id
-                  }
-                }
+                name
               }
               ... on ProjectV2SingleSelectField {
                 id
@@ -181,14 +172,10 @@ export async function addToProject(): Promise<void> {
     },
   )
 
-  const projectFields = fieldsResp.node?.fields.nodes ?? []
-
-  const results = await check.checkDictionaryInArray(fieldsObj, projectFields)
-  let itemId = ''
-
   // Next, use the GraphQL API to add the issue to the project.
   // If the issue has the same owner as the project, we can directly
   // add a project item. Otherwise, we add a draft issue.
+  let itemId = ''
   if (issueOwnerName === projectOwnerName) {
     core.info('Creating project item')
 
@@ -234,27 +221,36 @@ export async function addToProject(): Promise<void> {
     itemId = addResp.addProjectV2DraftIssue.projectItem.id
   }
 
-  // update the project with the custom fields
-  for (const result of results) {
-    const updateResp = await octokit.graphql<ProjectUpdateItemResponse>(
-      `mutation UpdateFieldValue($input: UpdateProjectV2ItemFieldValueInput!) {
-        updateProjectV2ItemFieldValue(input: $input) {
-          projectV2Item {
-            id
-          }
-        }
-      }`,
-      {
-        input: {
-          projectId,
-          itemId,
-          fieldId: result.id,
-          value: result.value,
-        },
-      },
-    )
+  // check if fields is empty string
+  if (fields) {
+    const projectFields = fieldsResp.node?.fields.nodes ?? []
+    const fieldsObj = fields.split('\n').reduce((acc, f) => {
+      const [key, value] = f.split('=').map(s => s.trim())
+      acc[key.toLowerCase()] = value.toLowerCase()
+      return acc
+    }, {} as {[key: string]: string})
+    const results = await check.checkDictionaryInArray(fieldsObj, projectFields)
 
-    core.setOutput('itemId', updateResp.updateProjectV2ItemFieldValue.projectV2Item.id)
+    // update the project with the custom fields
+    for (const result of results) {
+      const updateResp = await octokit.graphql<ProjectUpdateItemResponse>(
+        `mutation UpdateFieldValue($input: UpdateProjectV2ItemFieldValueInput!) {
+          updateProjectV2ItemFieldValue(input: $input) {
+            projectV2Item {
+              id
+            }
+          }
+        }`,
+        {
+          input: {
+            projectId,
+            itemId,
+            fieldId: result.id,
+            value: result.value,
+          },
+        },
+      )
+    }
   }
 }
 
