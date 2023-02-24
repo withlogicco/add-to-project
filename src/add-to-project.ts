@@ -125,8 +125,8 @@ export async function addToProject(): Promise<void> {
     }`,
     {
       projectOwnerName,
-      projectNumber,
-    },
+      projectNumber
+    }
   )
 
   const projectId = idResp[ownerTypeQuery]?.projectV2.id
@@ -153,9 +153,9 @@ export async function addToProject(): Promise<void> {
       {
         input: {
           projectId,
-          contentId,
-        },
-      },
+          contentId
+        }
+      }
     )
 
     core.setOutput('itemId', addResp.addProjectV2ItemById.item.id)
@@ -176,8 +176,8 @@ export async function addToProject(): Promise<void> {
       }`,
       {
         projectId,
-        title: issue?.html_url,
-      },
+        title: issue?.html_url
+      }
     )
 
     core.setOutput('itemId', addResp.addProjectV2DraftIssue.projectItem.id)
