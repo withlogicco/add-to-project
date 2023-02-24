@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as check from './check-custom-fields'
+import * as utils from './utils'
 
 // TODO: Ensure this (and the Octokit client) works for non-github.com URLs, as well.
 // https://github.com/orgs|users/<ownerName>/projects/<projectNumber>
@@ -57,9 +57,13 @@ interface ProjectV2AddDraftIssueResponse {
 }
 
 export async function addToProject(): Promise<void> {
+  process.env['INPUT_PROJECT-URL'] = 'https://github.com/orgs/withlogicco/projects/12'
+  process.env['INPUT_GITHUB-TOKEN'] = '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'
+  process.env['INPUT_FIELDS'] = 'Product=option 2\nClient=Arpedon'
+
   const projectUrl = core.getInput('project-url', {required: true})
   const ghToken = core.getInput('github-token', {required: true})
-  const fields = core.getInput('fields', {required: false})
+  const fields = core.getMultilineInput('fields', {required: false})
 
   const labeled =
     core
@@ -71,9 +75,11 @@ export async function addToProject(): Promise<void> {
 
   const octokit = github.getOctokit(ghToken)
 
-  const issue = github.context.payload.issue ?? github.context.payload.pull_request
+  const issueOwnerName = 'withlogicco'
+  const issue = utils.JSON_OBJECT
+  // const issue = github.context.payload.issue ?? github.context.payload.pull_request
   const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
-  const issueOwnerName = github.context.payload.repository?.owner.login
+  // const issueOwnerName = github.context.payload.repository?.owner.login
 
   core.debug(`Issue/PR owner: ${issueOwnerName}`)
 
@@ -135,37 +141,6 @@ export async function addToProject(): Promise<void> {
   core.debug(`Project node ID: ${projectId}`)
   core.debug(`Content ID: ${contentId}`)
 
-  // Next, use the GraphQL API to request the project's fields using the node ID.
-  const fieldsResp = await octokit.graphql<ProjectFieldsResponse>(
-    `query getProjectFields($projectId: ID!) {
-      node(id: $projectId) {
-        ... on ProjectV2 {
-          fields(first: 50) {
-            nodes {
-              ... on ProjectV2Field {
-                id
-                dataType
-                name
-              }
-              ... on ProjectV2SingleSelectField {
-                id
-                name
-                dataType
-                options {
-                  id
-                  name
-                }
-              }
-            }
-          }
-        }
-      }
-    }`,
-    {
-      projectId,
-    },
-  )
-
   // Next, use the GraphQL API to add the issue to the project.
   // If the issue has the same owner as the project, we can directly
   // add a project item. Otherwise, we add a draft issue.
@@ -215,36 +190,73 @@ export async function addToProject(): Promise<void> {
     itemId = addResp.addProjectV2DraftIssue.projectItem.id
   }
 
-  // check if fields is empty string
-  if (fields) {
-    const projectFields = fieldsResp.node?.fields.nodes ?? []
-    const fieldsObj = fields.split('\n').reduce((acc, f) => {
-      const [key, value] = f.split('=').map(s => s.trim())
-      acc[key.toLowerCase()] = value.toLowerCase()
-      return acc
-    }, {} as {[key: string]: string})
-    const results = await check.checkDictionaryInArray(fieldsObj, projectFields)
-
-    // update the project with the custom fields
-    for (const result of results) {
-      const updateResp = await octokit.graphql<ProjectUpdateItemResponse>(
-        `mutation UpdateFieldValue($input: UpdateProjectV2ItemFieldValueInput!) {
-          updateProjectV2ItemFieldValue(input: $input) {
-            projectV2Item {
-              id
+  
+  // Next, use the GraphQL API to request the project's fields using the node ID.
+  const fieldsResp = await octokit.graphql<ProjectFieldsResponse>(
+    `query getProjectFields($projectId: ID!) {
+      node(id: $projectId) {
+        ... on ProjectV2 {
+          fields(first: 50) {
+            nodes {
+              ... on ProjectV2Field {
+                id
+                dataType
+                name
+              }
+              ... on ProjectV2SingleSelectField {
+                id
+                name
+                dataType
+                options {
+                  id
+                  name
+                }
+              }
             }
           }
-        }`,
-        {
-          input: {
-            projectId,
-            itemId,
-            fieldId: result.id,
-            value: result.value,
-          },
+        }
+      }
+    }`,
+    {
+      projectId,
+    },
+  )
+    
+  if (!fields.length) {
+    return
+  }
+  const projectFields = fieldsResp.node?.fields.nodes ?? []
+  
+  const fieldsObj: {[key: string]: string} = {}
+    
+  // check if fields is empty string
+  
+  fields.forEach(str => {
+    const [key, value] = str.split('=')
+    fieldsObj[key] = value
+  })
+
+  const results = await utils.getFieldUpdates(fieldsObj, projectFields)
+
+  // update the project with the custom fields
+  for (const result of results) {
+    const updateResp = await octokit.graphql<ProjectUpdateItemResponse>(
+      `mutation UpdateFieldValue($input: UpdateProjectV2ItemFieldValueInput!) {
+        updateProjectV2ItemFieldValue(input: $input) {
+          projectV2Item {
+            id
+          }
+        }
+      }`,
+      {
+        input: {
+          projectId,
+          itemId,
+          fieldId: result.id,
+          value: result.value,
         },
-      )
-    }
+      },
+    )
   }
 }
 
