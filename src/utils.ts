@@ -30,9 +30,10 @@ export async function getFieldUpdates(fieldValues: {[key: string]: string}, proj
   const result = []
 
   //remove empty objects from array of objects
-  const clearedProjectFields = array.filter(
-    objs => !(objs && Object.keys(objs).length === 0 && objs.constructor === Object),
-  )
+  const isNotEmpty = (objs: Record<string, any>) =>
+    !(objs && Object.keys(objs).length === 0 && objs.constructor === Object)
+  const clearedProjectFields = array.filter(isNotEmpty)
+
   for (const [fieldName, fieldValue] of Object.entries(fieldValues)) {
     const foundField = clearedProjectFields.find(
       projectField => projectField.name.toLowerCase() === fieldName.toLowerCase(),
