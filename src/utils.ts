@@ -20,9 +20,8 @@ interface ProjectFieldsType {
  * @returns {Promise<[]>}
 */
 
-export async function getFieldUpdates(fieldValues: {[key: string]: string}, projectFields: []) {
+export async function getFieldUpdates(fieldValues: { [key: string]: string }, projectFields: []) {
   const array: ProjectFieldsType[] = projectFields
-
   const result = []
 
   //remove empty objects from array of objects
@@ -39,30 +38,30 @@ export async function getFieldUpdates(fieldValues: {[key: string]: string}, proj
       core.warning(`Could not find field with name ${fieldName}`)
       continue
     }
-    // TODO: Add support for other data types (e.g. ITERATIONS)
+
     switch (foundField.dataType) {
       case 'SINGLE_SELECT':
         const optionFound = foundField.options.find(option => option.name.toLowerCase() === fieldValue.toLowerCase())
-
         if (!optionFound) {
           core.warning(`Could not find option for field ${foundField.name} with value ${fieldValue}`)
           continue
         }
+
         const id = foundField.id
         const value = optionFound.id
-        result.push({id, value: {singleSelectOptionId: value}})
+        result.push({ id, value: { singleSelectOptionId: value } })
         continue
 
       case 'TEXT':
         const textId = foundField.id
         const textValue = foundField.name
-        result.push({id: textId, value: {textValueName: textValue}})
+        result.push({ id: textId, value: { textValueName: textValue } })
         continue
 
       case 'NUMBER':
         const numberId = foundField.id
         const numberValue = foundField.name
-        result.push({id: numberId, value: {numberValue}})
+        result.push({ id: numberId, value: { numberValue } })
         continue
 
       default:

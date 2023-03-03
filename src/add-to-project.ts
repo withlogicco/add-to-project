@@ -57,10 +57,9 @@ interface ProjectV2AddDraftIssueResponse {
 }
 
 export async function addToProject(): Promise<void> {
-  const projectUrl = core.getInput('project-url', {required: true})
-  const ghToken = core.getInput('github-token', {required: true})
-  const fields = core.getMultilineInput('fields', {required: false})
-
+  const projectUrl = core.getInput('project-url', { required: true })
+  const ghToken = core.getInput('github-token', { required: true })
+  const fields = core.getMultilineInput('fields', { required: false })
   const labeled =
     core
       .getInput('labeled')
@@ -72,7 +71,7 @@ export async function addToProject(): Promise<void> {
   const octokit = github.getOctokit(ghToken)
 
   const issue = github.context.payload.issue ?? github.context.payload.pull_request
-  const issueLabels: string[] = (issue?.labels ?? []).map((l: {name: string}) => l.name.toLowerCase())
+  const issueLabels: string[] = (issue?.labels ?? []).map((l: { name: string }) => l.name.toLowerCase())
   const issueOwnerName = github.context.payload.repository?.owner.login
 
   core.debug(`Issue/PR owner: ${issueOwnerName}`)
@@ -187,7 +186,7 @@ export async function addToProject(): Promise<void> {
   if (!fields.length) {
     return
   }
-  
+
   // Next, use the GraphQL API to request the project's fields using the node ID.
   const fieldsResp = await octokit.graphql<ProjectFieldsResponse>(
     `query getProjectFields($projectId: ID!) {
@@ -218,11 +217,11 @@ export async function addToProject(): Promise<void> {
       projectId,
     },
   )
-    
+
   const projectFields = fieldsResp.node?.fields.nodes ?? []
-  
-  const fieldsObj: {[key: string]: string} = {}
-  
+
+  const fieldsObj: { [key: string]: string } = {}
+
   fields.forEach(str => {
     const [key, value] = str.split('=')
     fieldsObj[key] = value
