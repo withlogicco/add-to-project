@@ -16,6 +16,9 @@ inputs:
   label-operator:
     required: false
     description: The behavior of the labels filter, AND to match all labels, OR to match any label, NOT to exclude any listed label (default is OR)
+  fields:
+    required: false
+    description: A multiline input containing field=value pairs.
 runs:
   using: 'node16'
   main: 'dist/index.js'
