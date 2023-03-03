@@ -101,7 +101,7 @@ export async function addToProject(): Promise<void> {
 
   if (!urlMatch) {
     throw new Error(
-      `Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`,
+      `Invalid project URL: ${projectUrl}. Project URL should match the format https://github.com/<orgs-or-users>/<ownerName>/projects/<projectNumber>`
     )
   }
 
@@ -184,6 +184,9 @@ export async function addToProject(): Promise<void> {
     itemId = addResp.addProjectV2DraftIssue.projectItem.id
   }
 
+  if (!fields.length) {
+    return
+  }
   
   // Next, use the GraphQL API to request the project's fields using the node ID.
   const fieldsResp = await octokit.graphql<ProjectFieldsResponse>(
@@ -216,14 +219,9 @@ export async function addToProject(): Promise<void> {
     },
   )
     
-  if (!fields.length) {
-    return
-  }
   const projectFields = fieldsResp.node?.fields.nodes ?? []
   
   const fieldsObj: {[key: string]: string} = {}
-    
-  // check if fields is empty string
   
   fields.forEach(str => {
     const [key, value] = str.split('=')

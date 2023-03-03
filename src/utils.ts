@@ -1,9 +1,5 @@
 import * as core from '@actions/core'
 
-interface FieldValueType {
-  [key: string]: string
-}
-
 interface OptionType {
   id: string
   name: string
@@ -40,7 +36,7 @@ export async function getFieldUpdates(fieldValues: {[key: string]: string}, proj
     )
 
     if (!foundField?.dataType) {
-      core.debug(`Could not find field with name ${fieldName}`)
+      core.warning(`Could not find field with name ${fieldName}`)
       continue
     }
     // TODO: Add support for other data types (e.g. ITERATIONS)
@@ -49,29 +45,29 @@ export async function getFieldUpdates(fieldValues: {[key: string]: string}, proj
         const optionFound = foundField.options.find(option => option.name.toLowerCase() === fieldValue.toLowerCase())
 
         if (!optionFound) {
-          core.debug(`Could not find option for field ${foundField.name} with value ${fieldValue}`)
+          core.warning(`Could not find option for field ${foundField.name} with value ${fieldValue}`)
           continue
         }
         const id = foundField.id
         const value = optionFound.id
         result.push({id, value: {singleSelectOptionId: value}})
-        break
+        continue
 
       case 'TEXT':
         const textId = foundField.id
         const textValue = foundField.name
         result.push({id: textId, value: {textValueName: textValue}})
-        break
+        continue
 
       case 'NUMBER':
         const numberId = foundField.id
         const numberValue = foundField.name
         result.push({id: numberId, value: {numberValue}})
-        break
+        continue
 
       default:
         core.warning(`Unsupported data type for field ${fieldName}: ${foundField.dataType}`)
-        break
+        continue
     }
   }
   return result
