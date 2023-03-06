@@ -226,7 +226,7 @@ export async function addToProject(): Promise<void> {
   fields.forEach(str => {
     const [key, value] = str.split('=')
     if (!key || !value) {
-      throw new Error(`Invalid field: ${str}`)
+      throw new Error(`Invalid field ${str}. The field should be in the format of key=value.`)
     }
     fieldsObj[key] = value
   })
